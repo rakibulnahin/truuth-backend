@@ -15,27 +15,31 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = 'uploads/';
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath);
-    }
-    cb(null, uploadPath);
-  },
-  filename: (req: any, file, cb) => {
-    // Access the username attached by your authenticateToken middleware
-    const username = req.user?.username || 'unknown';
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     const uploadPath = 'uploads/';
+//     if (!fs.existsSync(uploadPath)) {
+//       fs.mkdirSync(uploadPath);
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: (req: any, file, cb) => {
+//     // Access the username attached by your authenticateToken middleware
+//     const username = req.user?.username || 'unknown';
     
-    // Create a clean filename: username-timestamp-originalname.ext
-    const fileExt = path.extname(file.originalname);
-    const fileName = `${username}-${Date.now()}${fileExt}`;
+//     // Create a clean filename: username-timestamp-originalname.ext
+//     const fileExt = path.extname(file.originalname);
+//     const fileName = `${username}-${Date.now()}${fileExt}`;
     
-    cb(null, fileName);
-  }
-});
+//     cb(null, fileName);
+//   }
+// });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 
 // Routes
 app.get('/', (req: Request, res: Response) => {
@@ -86,13 +90,11 @@ app.post('/analyze',  upload.single('document'), async (req: AuthRequest, res) =
     if (!file) return res.status(400).json({ error: 'No file uploaded' });
 
     // Read file and convert to Base64 for OpenAI
-    console.log("here", file.filename)
-    const fileBuffer = fs.readFileSync(file.path);
-    console.log("not here")
-    const base64File = fileBuffer.toString('base64');
+    
+    const base64File = file.buffer.toString('base64');
     console.log("Base64 File:", base64File[0], base64File[1], base64File[2], "..."); // Log first few chars for verification 
     // Call OpenAI for Analysis
-    const response = await AnalyserNode(file.filename, base64File)
+    const response = await AnalyserNode(file.originalname, base64File)
     console.log("Analysis Response:", response.status, response.message);
     // Cleanup: Delete the file from local storage after analysis
     // fs.unlinkSync(file.path);
