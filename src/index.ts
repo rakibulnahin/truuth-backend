@@ -7,7 +7,7 @@ import fs, { stat } from 'fs';
 import path from 'path';
 
 
-import { authenticateToken, AuthRequest } from '../../backend2/src/middleware/auth';
+import { authenticateToken, AuthRequest } from '../src/middleware/auth';
 const app = express();
 const PORT = 5000;
 dotenv.config();
