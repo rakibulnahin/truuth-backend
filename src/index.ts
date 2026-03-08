@@ -50,10 +50,7 @@ app.post('/data', (req: Request, res: Response) => {
   });
 });
 
-// Start Server
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(5000, () => console.log('Server running on 5000'));
-}
+
 
 
 
@@ -112,3 +109,9 @@ app.post('/analyze',  upload.single('document'), async (req: AuthRequest, res) =
     res.status(500).json({ error: "Failed to analyze document" });
   }
 })
+
+// Start Server
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(5000, () => console.log('Server running on 5000'));
+}
+export default app;
